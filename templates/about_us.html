@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}关于我们{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- 页面标题 -->
+    <div class="mb-8 text-center">
+        <h1 class="text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">关于我们</h1>
+        <p class="text-xl text-slate-600 dark:text-slate-400">智能商品上架系统 - 让电商运营更简单</p>
+    </div>
+
+    <!-- 系统介绍 -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6">系统简介</h2>
+        <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+            智能商品上架系统是一款基于人工智能技术的电商辅助工具，旨在帮助商家快速、高效地完成商品上架工作。
+            通过先进的图像识别和自然语言处理技术，系统能够自动分析商品图片，生成专业的商品标题、描述和卖点，
+            大幅提升电商运营效率。
+        </p>
+        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            我们的使命是让每一个电商从业者都能享受到 AI 技术带来的便利，无论您是个人卖家还是大型企业，
+            都能通过我们的系统简化工作流程，专注于核心业务。
+        </p>
+    </div>
+
+    <!-- 核心功能 -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6">核心功能</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-camera text-primary text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">智能图像识别</h3>
+                    <p class="text-slate-600 dark:text-slate-400">自动识别商品类型、颜色、材质等特征，精准分类</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-pencil text-primary text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">AI文案生成</h3>
+                    <p class="text-slate-600 dark:text-slate-400">一键生成吸引人的商品标题、描述和卖点</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-tags text-primary text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">自动分类标签</h3>
+                    <p class="text-slate-600 dark:text-slate-400">智能推荐商品分类和标签，支持手动调整</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-bar-chart text-primary text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">销售数据分析</h3>
+                    <p class="text-slate-600 dark:text-slate-400">实时监控销售数据，提供优化建议</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-microphone text-primary text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">语音介绍生成</h3>
+                    <p class="text-slate-600 dark:text-slate-400">自动生成商品语音介绍，提升用户体验</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-database text-primary text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">批量管理</h3>
+                    <p class="text-slate-600 dark:text-slate-400">支持批量上传、编辑和状态管理</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 技术栈 -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6">技术架构</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-server text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">后端技术</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">Python Flask + 通义千问 API</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-desktop text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">前端技术</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">HTML5 + Tailwind CSS + JavaScript</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-microchip text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">AI技术</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">图像识别 + NLP + 语音合成</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 版本信息 -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6">版本信息</h2>
+        <div class="space-y-4">
+            <div class="flex justify-between items-center py-3 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-slate-600 dark:text-slate-400">系统版本</span>
+                <span class="text-slate-800 dark:text-slate-100 font-semibold">3.1.0</span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-slate-600 dark:text-slate-400">开发团队</span>
+                <span class="text-slate-800 dark:text-slate-100 font-semibold">炳材</span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-slate-600 dark:text-slate-400">发布日期</span>
+                <span class="text-slate-800 dark:text-slate-100 font-semibold">2025-12-16</span>
+            </div>
+            <div class="flex justify-between items-center py-3">
+                <span class="text-slate-600 dark:text-slate-400">GitHub</span>
+                <a href="https://github.com/Xuan-666" target="_blank" class="text-primary hover:underline">Xuan-666</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系方式 -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6">联系我们</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-envelope text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">邮箱</h3>
+                <a href="mailto:2940472078@qq.com" class="text-primary hover:underline">2940472078@qq.com</a>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-phone text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">电话</h3>
+                <p class="text-slate-600 dark:text-slate-400">400-888-8888</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-github text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">GitHub</h3>
+                <a href="https://github.com/Xuan-666" target="_blank" class="text-primary hover:underline">访问项目</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

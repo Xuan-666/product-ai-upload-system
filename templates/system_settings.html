@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}系统设置{% endblock %}
+
+{% block extra_css %}
+<style type="text/tailwindcss">
+    @layer utilities {
+        /* 开关按钮样式 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #4F46E5;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+            <!-- 页面标题 -->
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">系统设置</h2>
+                <p class="text-slate-500 dark:text-slate-400">配置店铺信息、功能开关和系统偏好设置</p>
+            </div>
+
+            <!-- 设置内容区 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 左侧设置菜单 -->
+                <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">设置选项</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#store-settings" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-primary/10 text-primary">
+                                <i class="fa fa-store text-lg"></i>
+                                <span>店铺设置</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#function-settings" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fa fa-toggle-on text-lg"></i>
+                                <span>功能开关</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#language-settings" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fa fa-language text-lg"></i>
+                                <span>语言与语气</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#system-info" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fa fa-info-circle text-lg"></i>
+                                <span>系统信息</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 右侧设置内容 -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- 店铺设置 -->
+                    <div id="store-settings" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">店铺设置</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">店铺名称</label>
+                                <input type="text" value="智能商品店铺" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">店铺描述</label>
+                                <textarea class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary h-24">专业的智能商品上架与管理平台，提供AI驱动的商品分析和销售优化服务。</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">店铺Logo</label>
+                                <div class="flex items-center space-x-4">
+                                    <div id="logo-preview" class="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+                                        <i class="fa fa-shopping-bag text-2xl text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <input type="file" id="logo-upload" accept="image/jpeg,image/png" class="hidden">
+                                        <button id="upload-logo-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                            <i class="fa fa-upload mr-2"></i> 上传Logo
+                                        </button>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">支持JPG、PNG格式，大小不超过2MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 功能开关 -->
+                    <div id="function-settings" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">功能开关</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-medium">启用语音播报功能</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">为商品自动生成语音介绍</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-medium">自动分析新上传商品</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">上传图片后自动进行AI分析</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-medium">启用批量上传功能</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">支持同时上传多个商品图片</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-medium">自动保存分析结果</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">自动保存AI分析的商品信息</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-medium">启用数据统计功能</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">收集销售数据用于分析报告</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 语言与语气设置 -->
+                    <div id="language-settings" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">语言与语气</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">系统语言</label>
+                                <select class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="zh-CN">简体中文</option>
+                                    <option value="zh-TW">繁体中文</option>
+                                    <option value="en-US">English</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">商品描述语气</label>
+                                <select class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="professional">专业正式</option>
+                                    <option value="friendly">亲切友好</option>
+                                    <option value="enthusiastic" selected>热情活力</option>
+                                    <option value="humorous">幽默风趣</option>
+                                    <option value="minimalist">简洁明了</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">语音播报风格</label>
+                                <select class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="female" selected>女声</option>
+                                    <option value="male">男声</option>
+                                    <option value="child">童声</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">语音播报速度</label>
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-sm">慢</span>
+                                    <input type="range" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                    <span class="text-sm">快</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 系统信息 -->
+                    <div id="system-info" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">系统信息</h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">系统版本</h4>
+                                    <p class="text-lg font-medium">3.1.0</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">开发团队</h4>
+                                    <p class="text-lg font-medium">炳材</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">发布日期</h4>
+                                    <p class="text-lg font-medium">2025-12-16</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">更新检查</h4>
+                                    <button class="px-3 py-1 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm">
+                                        <i class="fa fa-refresh mr-1"></i> 检查更新
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">系统说明</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-300">智能商品上架系统是一款基于AI技术的商品管理平台，支持商品图片自动分析、标题生成、卖点提取和语音介绍等功能，帮助商家快速高效地上架和管理商品。</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">联系方式</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-envelope text-primary"></i>
+                                        <span class="text-sm">2940472078@qq.com</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-phone text-primary"></i>
+                                        <span class="text-sm">400-888-8888</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fa fa-github text-primary"></i>
+                                        <a href="https://github.com/Xuan-666" target="_blank" class="text-sm text-primary hover:underline">GitHub: Xuan-666</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 保存按钮 -->
+            <div class="mt-6 flex justify-end">
+                <button class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium shadow-md">
+                    <i class="fa fa-save mr-2"></i> 保存设置
+                </button>
+            </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // 店铺Logo上传功能
+        const uploadLogoBtn = document.getElementById('upload-logo-btn');
+        const logoUpload = document.getElementById('logo-upload');
+        const logoPreview = document.getElementById('logo-preview');
+        
+        // 点击上传按钮触发文件选择
+        uploadLogoBtn.addEventListener('click', () => {
+            logoUpload.click();
+        });
+        
+        // 文件选择后预览
+        logoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // 检查文件大小（不超过2MB）
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('文件大小不能超过2MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    // 清空预览区域并显示新图片
+                    logoPreview.innerHTML = `<img src="${event.target.result}" alt="店铺Logo" class="w-full h-full object-cover">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 保存设置功能
+        const saveButton = document.querySelector('button.bg-primary');
+        saveButton.addEventListener('click', () => {
+            // 显示保存成功提示
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<i class="fa fa-check mr-2"></i> 设置已保存';
+            
+            // 2秒后恢复原始文本
+            setTimeout(() => {
+                saveButton.innerHTML = originalText;
+            }, 2000);
+        });
+    </script>
+{% endblock %}

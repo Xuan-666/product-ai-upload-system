@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}销售分析{% endblock %}
+
+{% block content %}
+            <!-- 页面标题 -->
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">销售分析</h2>
+                <p class="text-slate-500 dark:text-slate-400">查看商品销售数据和分析报告</p>
+            </div>
+
+            <!-- 销售概览卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- 总销售额 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">总销售额</p>
+                            <h3 class="text-2xl font-bold text-primary">¥128,560</h3>
+                            <p class="text-xs text-green-500 dark:text-green-400 mt-1">
+                                <i class="fa fa-arrow-up mr-1"></i> 12.5% 较上月
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa fa-line-chart text-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 订单数 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">订单数</p>
+                            <h3 class="text-2xl font-bold text-primary">1,560</h3>
+                            <p class="text-xs text-green-500 dark:text-green-400 mt-1">
+                                <i class="fa fa-arrow-up mr-1"></i> 8.2% 较上月
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa fa-shopping-cart text-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 访客数 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">访客数</p>
+                            <h3 class="text-2xl font-bold text-primary">28,950</h3>
+                            <p class="text-xs text-red-500 dark:text-red-400 mt-1">
+                                <i class="fa fa-arrow-down mr-1"></i> 3.1% 较上月
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa fa-users text-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 转化率 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">转化率</p>
+                            <h3 class="text-2xl font-bold text-primary">5.4%</h3>
+                            <p class="text-xs text-green-500 dark:text-green-400 mt-1">
+                                <i class="fa fa-arrow-up mr-1"></i> 0.8% 较上月
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa fa-percent text-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图表区域 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- 销售额趋势图 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">销售额趋势</h3>
+                        <div class="flex space-x-2">
+                            <button class="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full">周</button>
+                            <button class="text-xs px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-full">月</button>
+                            <button class="text-xs px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-full">年</button>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        // 图表数据
+                        const chartData = {
+                            // 周销售额数据
+                            week: {
+                                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                                values: [25000, 30000, 28000, 35000, 33000, 40000, 38000]
+                            },
+                            // 月销售额数据
+                            month: {
+                                labels: ['1日', '5日', '10日', '15日', '20日', '25日', '30日'],
+                                values: [45000, 52000, 48000, 58000, 62000, 68000, 72000]
+                            },
+                            // 年销售额数据
+                            year: {
+                                labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                                values: [120000, 135000, 142000, 158000, 165000, 172000, 180000, 175000, 185000, 192000, 200000, 210000]
+                            }
+                        };
+
+                        // 获取图表元素
+                        const ctx = document.getElementById('trend-chart').getContext('2d');
+                        
+                        // 创建图表
+                        let salesChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: chartData.week.labels,
+                                datasets: [{
+                                    label: '销售额',
+                                    data: chartData.week.values,
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                        padding: 10,
+                                        cornerRadius: 5,
+                                        titleFont: {
+                                            size: 14,
+                                            weight: 'bold'
+                                        },
+                                        bodyFont: {
+                                            size: 13
+                                        },
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `销售额: ¥${context.parsed.y.toLocaleString()}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            font: {
+                                                size: 12
+                                            }
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)'
+                                        },
+                                        ticks: {
+                                            font: {
+                                                size: 12
+                                            },
+                                            callback: function(value) {
+                                                return '¥' + (value / 1000) + 'k';
+                                            }
+                                        }
+                                    }
+                                },
+                                animation: {
+                                    duration: 1000,
+                                    easing: 'easeInOutQuart'
+                                }
+                            }
+                        });
+
+                        // 获取按钮
+                        const weekBtn = document.querySelector('.flex.space-x-2 button:nth-child(1)');
+                        const monthBtn = document.querySelector('.flex.space-x-2 button:nth-child(2)');
+                        const yearBtn = document.querySelector('.flex.space-x-2 button:nth-child(3)');
+
+                        // 按钮点击事件
+                        weekBtn.addEventListener('click', () => {
+                            updateChart('week');
+                            setActiveButton(weekBtn);
+                        });
+
+                        monthBtn.addEventListener('click', () => {
+                            updateChart('month');
+                            setActiveButton(monthBtn);
+                        });
+
+                        yearBtn.addEventListener('click', () => {
+                            updateChart('year');
+                            setActiveButton(yearBtn);
+                        });
+
+                        // 更新图表数据
+                        function updateChart(period) {
+                            salesChart.data.labels = chartData[period].labels;
+                            salesChart.data.datasets[0].data = chartData[period].values;
+                            salesChart.update();
+                        }
+
+                        // 设置活跃按钮样式
+                        function setActiveButton(activeBtn) {
+                            const buttons = [weekBtn, monthBtn, yearBtn];
+                            buttons.forEach(btn => {
+                                btn.className = 'text-xs px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-full';
+                            });
+                            activeBtn.className = 'text-xs px-3 py-1 bg-primary/10 text-primary rounded-full';
+                        }
+                    </script>
+                </div>
+
+                <!-- 商品销售排名 -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">商品销售排名</h3>
+                        <button class="text-xs text-primary hover:underline">查看全部</button>
+                    </div>
+                    <div class="space-y-4">
+                        <!-- 排名项 -->
+                        {% for i in range(1, 6) %}
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm mr-3">
+                                    {{ i }}
+                                </div>
+                                <div>
+                                    <p class="font-medium">智能手表 Pro {{ i }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">电子数码</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium">¥{{ 25000 - (i * 2000) }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">
+                                    {{ 150 - (i * 15) }} 件
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 销售数据表格 -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">销售数据明细</h3>
+                    <button id="export-btn" class="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors">
+                        <i class="fa fa-download mr-1"></i> 导出数据
+                    </button>
+                </div>
+                <script>
+                    // 销售数据导出功能
+                    document.getElementById('export-btn').addEventListener('click', function() {
+                        // 直接跳转到导出路由
+                        window.location.href = '/export_sales_data';
+                    });
+                </script>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[600px]">
+                        <thead>
+                            <tr class="border-b border-slate-200 dark:border-slate-700">
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">订单编号</th>
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">商品名称</th>
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">分类</th>
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">价格</th>
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">数量</th>
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">销售额</th>
+                                <th class="text-left py-3 px-4 text-sm font-medium text-slate-500 dark:text-slate-400">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 6) %}
+                            <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                                <td class="py-3 px-4 text-sm">ORD-{{ 20240000 + i }}</td>
+                                <td class="py-3 px-4 text-sm">智能手表 Pro {{ i }}</td>
+                                <td class="py-3 px-4 text-sm">电子数码</td>
+                                <td class="py-3 px-4 text-sm">¥{{ 1500 + (i * 100) }}</td>
+                                <td class="py-3 px-4 text-sm">{{ 2 + i }}</td>
+                                <td class="py-3 px-4 text-sm font-medium">¥{{ (1500 + (i * 100)) * (2 + i) }}</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full">已完成</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+{% endblock %}

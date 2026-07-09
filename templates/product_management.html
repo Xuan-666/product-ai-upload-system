@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}商品管理{% endblock %}
+
+{% block content %}
+    <!-- 页面标题 -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">商品管理</h2>
+        <p class="text-slate-500 dark:text-slate-400">管理商品列表、库存、价格和售卖状态</p>
+    </div>
+
+    <!-- 筛选和搜索区域 -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 mb-6">
+        <form id="filter-form" method="GET" action="{{ url_for('product_management') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- 搜索框 -->
+            <div class="md:col-span-2">
+                <div class="relative">
+                    <input type="text" name="search" placeholder="搜索商品名称或ID" value="{{ search }}" class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                </div>
+            </div>
+            
+            <!-- 分类筛选 -->
+            <div>
+                <select name="category" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="" {% if not category %}selected{% endif %}>全部分类</option>
+                    <option value="electronics" {% if category == 'electronics' %}selected{% endif %}>电子产品</option>
+                    <option value="clothing" {% if category == 'clothing' %}selected{% endif %}>服装</option>
+                    <option value="home" {% if category == 'home' %}selected{% endif %}>家居用品</option>
+                    <option value="beauty" {% if category == 'beauty' %}selected{% endif %}>美妆</option>
+                    <option value="sports" {% if category == 'sports' %}selected{% endif %}>运动用品</option>
+                    <option value="food" {% if category == 'food' %}selected{% endif %}>食品</option>
+                    <option value="books" {% if category == 'books' %}selected{% endif %}>图书</option>
+                    <option value="toys" {% if category == 'toys' %}selected{% endif %}>玩具</option>
+                    <option value="other" {% if category == 'other' %}selected{% endif %}>其他</option>
+                </select>
+            </div>
+            
+            <!-- 状态筛选 -->
+            <div>
+                <select name="status" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="" {% if not status %}selected{% endif %}>全部状态</option>
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>在售</option>
+                    <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>下架</option>
+                    <option value="low_stock" {% if status == 'low_stock' %}selected{% endif %}>库存不足</option>
+                </select>
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="md:col-span-4 flex justify-end space-x-2">
+                <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                    <i class="fa fa-search mr-1"></i> 搜索
+                </button>
+                <a href="{{ url_for('product_management') }}" class="px-6 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                    <i class="fa fa-refresh mr-1"></i> 重置
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- 商品列表区域 -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+        <!-- 顶部操作栏 -->
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">商品列表</h3>
+            <a href="{{ url_for('product_upload') }}" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors inline-block">
+                <i class="fa fa-plus mr-2"></i> 新增商品
+            </a>
+        </div>
+        
+        <!-- 商品列表表格 -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200 dark:border-slate-700">
+                        <th class="text-left py-3 px-4 font-medium text-sm text-slate-500 dark:text-slate-400">商品图片</th>
+                        <th class="text-left py-3 px-4 font-medium text-sm text-slate-500 dark:text-slate-400">商品信息</th>
+                        <th class="text-left py-3 px-4 font-medium text-sm text-slate-500 dark:text-slate-400">价格</th>
+                        <th class="text-left py-3 px-4 font-medium text-sm text-slate-500 dark:text-slate-400">库存</th>
+                        <th class="text-left py-3 px-4 font-medium text-sm text-slate-500 dark:text-slate-400">状态</th>
+                        <th class="text-left py-3 px-4 font-medium text-sm text-slate-500 dark:text-slate-400">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if products %}
+                        {% for product in products %}
+                            <tr class="border-b border-slate-200 dark:border-slate-700">
+                                <td class="py-4 px-4">
+                                    {% if product.image %}
+                                        <img src="{{ url_for('uploaded_file', filename=product.image) }}" alt="{{ product.name }}" class="w-16 h-16 object-cover rounded-lg">
+                                    {% else %}
+                                        <img src="https://picsum.photos/seed/{{ product.id }}/80/80" alt="{{ product.name }}" class="w-16 h-16 object-cover rounded-lg">
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-4">
+                                    <p class="font-medium">{{ product.name }}</p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">SKU: {{ product.sku }}</p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                                        {% if product.category == 'electronics' %}电子产品
+                                        {% elif product.category == 'clothing' %}服装
+                                        {% elif product.category == 'home' %}家居用品
+                                        {% elif product.category == 'beauty' %}美妆
+                                        {% elif product.category == 'sports' %}运动用品
+                                        {% else %}{{ product.category }}
+                                        {% endif %}
+                                    </p>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <p class="font-medium">{{ product.price }}</p>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center">
+                                        <input type="number" value="{{ product.stock }}" class="w-20 px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" min="0" data-id="{{ product.id }}" data-field="stock">
+                                        <span class="text-xs text-slate-500 dark:text-slate-400 ml-1">件</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4">
+                                    {% if product.status == 'active' %}
+                                        <span class="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs product-status" data-id="{{ product.id }}">在售</span>
+                                    {% elif product.status == 'inactive' %}
+                                        <span class="inline-block px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-xs product-status" data-id="{{ product.id }}">下架</span>
+                                    {% elif product.status == 'low_stock' %}
+                                        <span class="inline-block px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-xs product-status" data-id="{{ product.id }}">库存不足</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-4">
+                                    <div class="flex space-x-2">
+                                        <button class="p-1 text-primary hover:bg-primary/10 rounded transition-colors view-product" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.price }}" data-stock="{{ product.stock }}" data-category="{{ product.category }}" data-status="{{ product.status }}" data-description="{{ product.description }}">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+                                        <button class="p-1 text-primary hover:bg-primary/10 rounded transition-colors edit-product" data-id="{{ product.id }}">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button class="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-colors delete-product" data-id="{{ product.id }}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="py-10 text-center text-slate-500 dark:text-slate-400">
+                                <i class="fa fa-box-open text-4xl mb-2"></i>
+                                <p>暂无商品数据</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 分页 -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-slate-500 dark:text-slate-400">
+                {% if total > 0 %}
+                    显示第 <span class="font-medium">{{ (page - 1) * per_page + 1 }}</span> 到 <span class="font-medium">{{ [page * per_page, total] | min }}</span> 条，共 <span class="font-medium">{{ total }}</span> 条记录
+                {% else %}
+                    暂无数据
+                {% endif %}
+            </div>
+            {% if total_pages > 1 %}
+            <div class="flex space-x-1">
+                <a href="{{ url_for('product_management', page=page-1, search=search, category=category, status=status) }}" 
+                   class="px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors {% if page <= 1 %}opacity-50 pointer-events-none{% endif %}">
+                    <i class="fa fa-chevron-left"></i>
+                </a>
+                {% for p in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('product_management', page=p, search=search, category=category, status=status) }}" 
+                       class="px-4 py-1 rounded-lg {% if p == page %}bg-primary text-white{% else %}border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700{% endif %} transition-colors">
+                        {{ p }}
+                    </a>
+                {% endfor %}
+                <a href="{{ url_for('product_management', page=page+1, search=search, category=category, status=status) }}" 
+                   class="px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors {% if page >= total_pages %}opacity-50 pointer-events-none{% endif %}">
+                    <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // 商品状态切换功能
+        const statusBadges = document.querySelectorAll('.product-status');
+        statusBadges.forEach(badge => {
+            badge.style.cursor = 'pointer';
+            badge.addEventListener('click', () => {
+                const productId = badge.dataset.id;
+                const currentStatus = badge.textContent.trim();
+                let newStatus, newClass, newStatusValue;
+                
+                if (currentStatus === '在售') {
+                    newStatus = '下架';
+                    newClass = 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+                    newStatusValue = 'inactive';
+                } else if (currentStatus === '下架') {
+                    newStatus = '在售';
+                    newClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+                    newStatusValue = 'active';
+                } else if (currentStatus === '库存不足') {
+                    newStatus = '在售';
+                    newClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+                    newStatusValue = 'active';
+                }
+                
+                // 发送更新请求到服务器
+                fetch(`/update_product_status/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatusValue })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        badge.className = `inline-block px-2 py-1 ${newClass} rounded-full text-xs product-status`;
+                        badge.textContent = newStatus;
+                        badge.dataset.status = newStatusValue;
+                    } else {
+                        alert('状态更新失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('更新状态时出错：', error);
+                    alert('状态更新失败，请稍后重试');
+                });
+            });
+        });
+        
+        // 查看商品详情功能
+        const viewButtons = document.querySelectorAll('.view-product');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.id;
+                const productName = button.dataset.name;
+                const productPrice = button.dataset.price;
+                const productStock = button.dataset.stock;
+                const productCategory = button.dataset.category;
+                const productStatus = button.dataset.status;
+                const productDescription = button.dataset.description;
+                
+                // 创建模态框显示商品详情
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">商品详情</h3>
+                            <button class="close-modal text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+                                <i class="fa fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400">商品ID</label>
+                                <p class="text-lg">${productId}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400">商品名称</label>
+                                <p class="text-lg font-semibold">${productName}</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm font-medium text-slate-500 dark:text-slate-400">价格</label>
+                                    <p class="text-lg text-primary">¥${productPrice}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-slate-500 dark:text-slate-400">库存</label>
+                                    <p class="text-lg">${productStock} 件</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400">分类</label>
+                                <p class="text-lg">${getCategoryName(productCategory)}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400">状态</label>
+                                <p class="text-lg">${getStatusName(productStatus)}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400">描述</label>
+                                <p class="text-sm">${productDescription || '暂无描述'}</p>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button class="close-modal px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // 关闭模态框事件
+                modal.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        modal.remove();
+                    });
+                });
+                
+                // 点击背景关闭
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            });
+        });
+        
+        // 编辑商品功能
+        const editButtons = document.querySelectorAll('.edit-product');
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.id;
+                const row = button.closest('tr');
+                const nameCell = row.querySelector('td:nth-child(2) p:first-child');
+                const priceCell = row.querySelector('td:nth-child(3) p');
+                const stockInput = row.querySelector('input[data-field="stock"]');
+                
+                // 将单元格转换为可编辑状态
+                nameCell.innerHTML = `<input type="text" value="${nameCell.textContent}" class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" data-field="name">`;
+                priceCell.innerHTML = `<input type="number" value="${priceCell.textContent.replace('¥', '')}" class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" data-field="price" step="0.01">`;
+                
+                // 替换编辑按钮为保存按钮
+                button.outerHTML = `<button class="p-1 text-green-500 hover:bg-green-100 dark:hover:bg-green-900 rounded transition-colors save-product" data-id="${productId}"><i class="fa fa-save"></i></button>`;
+                
+                // 添加保存事件
+                const saveButton = row.querySelector('.save-product');
+                saveButton.addEventListener('click', () => {
+                    const newName = row.querySelector('input[data-field="name"]').value;
+                    const newPrice = row.querySelector('input[data-field="price"]').value;
+                    const newStock = stockInput.value;
+                    
+                    // 发送更新请求
+                    fetch(`/update_product/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: newName,
+                            price: parseFloat(newPrice),
+                            stock: parseInt(newStock)
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('商品信息更新成功！');
+                            location.reload();
+                        } else {
+                            alert('更新失败：' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('更新商品时出错：', error);
+                        alert('更新失败，请稍后重试');
+                    });
+                });
+            });
+        });
+        
+        // 库存修改后自动保存
+        const stockInputs = document.querySelectorAll('input[data-field="stock"]');
+        stockInputs.forEach(input => {
+            let timeoutId;
+            input.addEventListener('change', () => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    const productId = input.dataset.id;
+                    const newStock = input.value;
+                    
+                    fetch(`/update_product/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ stock: parseInt(newStock) })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 显示保存成功的提示
+                            const toast = document.createElement('div');
+                            toast.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                            toast.textContent = '库存已更新';
+                            document.body.appendChild(toast);
+                            setTimeout(() => toast.remove(), 2000);
+                        } else {
+                            alert('库存更新失败：' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('更新库存时出错：', error);
+                    });
+                }, 1000);
+            });
+        });
+        
+        // 辅助函数：获取分类名称
+        function getCategoryName(category) {
+            const categories = {
+                'electronics': '电子产品',
+                'clothing': '服装',
+                'home': '家居用品',
+                'beauty': '美妆',
+                'sports': '运动用品',
+                'food': '食品',
+                'books': '图书',
+                'toys': '玩具',
+                'other': '其他'
+            };
+            return categories[category] || category;
+        }
+        
+        // 辅助函数：获取状态名称
+        function getStatusName(status) {
+            const statuses = {
+                'active': '在售',
+                'inactive': '下架',
+                'low_stock': '库存不足'
+            };
+            return statuses[status] || status;
+        }
+        
+        // 删除商品功能
+        const deleteButtons = document.querySelectorAll('.delete-product');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.id;
+                
+                // 弹出确认对话框
+                if (confirm('确定要删除这个商品吗？')) {
+                    // 发送DELETE请求到服务器
+                    fetch(`/delete_product/${productId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 删除成功后刷新页面
+                            location.reload();
+                        } else {
+                            alert('删除失败：' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('删除商品时出错：', error);
+                        alert('删除商品时发生错误，请稍后重试');
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品智能上架系统平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4ade80;
+            --warning-color: #facc15;
+            --danger-color: #f87171;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            height: calc(100vh - 56px);
+            position: fixed;
+            top: 56px;
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: none;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image-placeholder {
+            background: linear-gradient(135deg, #f0f2f5, #e2e8f0);
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .product-image-placeholder:hover {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            border-color: #94a3b8;
+        }
+        
+        .upload-area {
+            border: 2px dashed #4361ee;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background-color: rgba(67, 97, 238, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .feature-tag {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 3px;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-card i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .progress-bar-custom {
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .product-preview {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .voice-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .voice-btn.playing {
+            background: linear-gradient(135deg, var(--danger-color), #ef4444);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .keyword-badge {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 4px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .keyword-badge:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .analysis-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            border-bottom: 2px solid rgba(67, 97, 238, 0.2);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        .selling-point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(76, 201, 240, 0.05);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .selling-point i {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-right: 15px;
+            margin-top: 3px;
+        }
+        
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+        
+        /* 页面内容样式 */
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+        
+        /* 加载动画 */
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 0.25em solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4361ee;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="text-center">
+            <div class="spinner"></div>
+            <p>正在分析商品信息...</p>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-box-open me-2"></i>
+                <span>商品智能上架系统</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('products')"><i class="fas fa-box-open me-1"></i> 商品管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('analytics')"><i class="fas fa-chart-bar me-1"></i> 数据分析</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('settings')"><i class="fas fa-cog me-1"></i> 设置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('profile')"><i class="fas fa-user me-1"></i> 用户中心</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-lg-2 sidebar d-none d-lg-block">
+                <div class="px-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showPage('dashboard')">
+                                <i class="fas fa-tachometer-alt me-2"></i> 仪表板
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('products')">
+                                <i class="fas fa-box-open me-2"></i> 商品管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('listing')">
+                                <i class="fas fa-file-alt me-2"></i> 商品上架
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('analytics')">
+                                <i class="fas fa-chart-line me-2"></i> 销售分析
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('keywords')">
+                                <i class="fas fa-tags me-2"></i> 关键词优化
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('ai-assistant')">
+                                <i class="fas fa-robot me-2"></i> AI助手
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('settings')">
+                                <i class="fas fa-cog me-2"></i> 系统设置
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-lg-10 main-content">
+                <!-- 仪表板页面 -->
+                <div id="dashboard" class="page-content active">
+                    <!-- 欢迎横幅 -->
+                    <div class="card bg-gradient-primary text-white mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h1 class="display-6 fw-bold">欢迎使用商品智能上架系统</h1>
+                                    <p class="lead">通过AI技术自动分析商品特征，生成吸引人的描述和标题，提升商品曝光率</p>
+                                    <button class="btn btn-light btn-lg" onclick="showPage('listing')">
+                                        <i class="fas fa-plus-circle me-2"></i>立即上架新商品
+                                    </button>
+                                </div>
+                                <div class="col-md-4 text-end d-none d-md-block">
+                                    <i class="fas fa-robot" style="font-size: 8rem; opacity: 0.2;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 统计卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-boxes"></i>
+                                <div class="stat-number">1,248</div>
+                                <div class="stat-label">商品总数</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-chart-line"></i>
+                                <div class="stat-number">89%</div>
+                                <div class="stat-label">转化率</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-eye"></i>
+                                <div class="stat-number">45.2K</div>
+                                <div class="stat-label">总浏览量</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-sync-alt"></i>
+                                <div class="stat-number">24</div>
+                                <div class="stat-label">今日上架</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 数据图表 -->
+                    <div class="row mt-4">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>商品表现趋势</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="performanceChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>品类分布</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="categoryChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商品上架页面 -->
+                <div id="listing" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-file-alt me-2"></i>商品上架</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-file-upload me-2"></i>商品信息</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="productForm">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">商品图片</label>
+                                            <div class="upload-area" id="dropArea">
+                                                <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                                <h5>拖拽图片到此处或点击上传</h5>
+                                                <p class="text-muted">支持 JPG, PNG, GIF 格式，最大 5MB</p>
+                                                <input type="file" id="productImage" accept="image/*" class="d-none">
+                                                <button type="button" class="btn btn-primary mt-2" id="uploadBtn">
+                                                    <i class="fas fa-folder-open me-2"></i>选择图片
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">商品名称</label>
+                                            <input type="text" class="form-control form-control-lg" id="productName" placeholder="请输入商品名称">
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">商品描述</label>
+                                            <textarea class="form-control" id="productDescription" rows="4" placeholder="系统将根据图片自动生成描述..."></textarea>
+                                            <div class="form-text">AI已为您生成描述，可手动修改</div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">价格</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">¥</span>
+                                                <input type="number" class="form-control" id="productPrice" placeholder="0.00">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">库存</label>
+                                            <input type="number" class="form-control" id="productStock" value="100">
+                                        </div>
+
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-outline-primary" id="analyzeBtn">
+                                                <i class="fas fa-sync-alt me-2"></i>重新分析
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane me-2"></i>上架商品
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <!-- 商品预览 -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-eye me-2"></i>商品预览</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="product-image-placeholder" id="imagePreview">
+                                        <div class="text-center">
+                                            <i class="fas fa-image fa-3x mb-3"></i>
+                                            <p>上传图片后将在此处显示</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <h5 class="text-muted" id="previewTitle">商品标题预览</h5>
+                                        <p class="text-muted" id="previewDescription">系统将根据商品特征自动生成吸引人的标题...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 语音播报 -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-volume-up me-2"></i>语音播报</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p>点击下方按钮听取商品描述</p>
+                                    <button class="voice-btn mx-auto" id="voiceBtn">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <div class="mt-3">
+                                        <small class="text-muted">支持中文普通话播报</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI分析结果 -->
+                    <div class="row mt-4" id="analysisSection" style="display: none;">
+                        <div class="col-12">
+                            <div class="analysis-section">
+                                <h5 class="section-title"><i class="fas fa-brain me-2"></i>AI智能分析结果</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-star text-warning me-2"></i>商品特征提取</h6>
+                                        <div class="mb-4" id="featuresContainer">
+                                            <!-- 特征标签将在这里动态生成 -->
+                                        </div>
+                                        
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-bullseye text-success me-2"></i>核心卖点</h6>
+                                        <div id="sellingPointsContainer">
+                                            <!-- 卖点将在这里动态生成 -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-heading text-primary me-2"></i>推荐标题</h6>
+                                        <div id="titlesContainer">
+                                            <!-- 标题将在这里动态生成 -->
+                                        </div>
+                                        
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-keyboard text-warning me-2"></i>关键词推荐</h6>
+                                        <div id="keywordsContainer">
+                                            <!-- 关键词将在这里动态生成 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商品管理页面 -->
+                <div id="products" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-box-open me-2"></i>商品管理</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">商品列表</h5>
+                                <button class="btn btn-primary" onclick="showPage('listing')">
+                                    <i class="fas fa-plus me-2"></i>添加商品
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>商品</th>
+                                            <th>价格</th>
+                                            <th>库存</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded me-3" style="width: 50px; height: 50px;"></div>
+                                                    <div>
+                                                        <h6 class="mb-0">无线蓝牙耳机</h6>
+                                                        <small class="text-muted">电子产品</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>¥299.00</td>
+                                            <td>150</td>
+                                            <td><span class="badge bg-success">在售</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded me-3" style="width: 50px; height: 50px;"></div>
+                                                    <div>
+                                                        <h6 class="mb-0">时尚运动鞋</h6>
+                                                        <small class="text-muted">服装配饰</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>¥599.00</td>
+                                            <td>85</td>
+                                            <td><span class="badge bg-success">在售</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded me-3" style="width: 50px; height: 50px;"></div>
+                                                    <div>
+                                                        <h6 class="mb-0">智能手表</h6>
+                                                        <small class="text-muted">电子产品</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>¥1299.00</td>
+                                            <td>42</td>
+                                            <td><span class="badge bg-warning">缺货</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据分析页面 -->
+                <div id="analytics" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-chart-line me-2"></i>销售分析</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-yen-sign"></i>
+                                <div class="stat-number">¥128,450</div>
+                                <div class="stat-label">总销售额</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-shopping-cart"></i>
+                                <div class="stat-number">1,892</div>
+                                <div class="stat-label">订单总数</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-users"></i>
+                                <div class="stat-number">3,421</div>
+                                <div class="stat-label">客户数量</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <i class="fas fa-percentage"></i>
+                                <div class="stat-number">24.5%</div>
+                                <div class="stat-label">转化率</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>销售趋势</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="salesChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>热销品类</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="hotCategoryChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统设置页面 -->
+                <div id="settings" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-cog me-2"></i>系统设置</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i>常规设置</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">店铺名称</label>
+                                            <input type="text" class="form-control" value="我的智能商店">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">默认货币</label>
+                                            <select class="form-select">
+                                                <option>人民币 (¥)</option>
+                                                <option>美元 ($)</option>
+                                                <option>欧元 (€)</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">时区</label>
+                                            <select class="form-select">
+                                                <option>北京时间 (UTC+8)</option>
+                                                <option>东京时间 (UTC+9)</option>
+                                                <option>纽约时间 (UTC-5)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="autoAnalyze" checked>
+                                            <label class="form-check-label" for="autoAnalyze">
+                                                自动分析新上传商品
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="enableVoice" checked>
+                                            <label class="form-check-label" for="enableVoice">
+                                                启用语音播报功能
+                                            </label>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">保存设置</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-sync-alt me-2"></i>系统维护</h5>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-outline-primary w-100 mb-2">
+                                        <i class="fas fa-database me-2"></i>备份数据
+                                    </button>
+                                    <button class="btn btn-outline-warning w-100 mb-2">
+                                        <i class="fas fa-sync me-2"></i>同步数据
+                                    </button>
+                                    <button class="btn btn-outline-danger w-100">
+                                        <i class="fas fa-trash me-2"></i>清理缓存
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>系统信息</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>版本：</strong> v1.2.0</p>
+                                    <p><strong>最后更新：</strong> 2023-07-15</p>
+                                    <p><strong>状态：</strong> <span class="text-success">运行正常</span></p>
+                                    <button class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-download me-2"></i>检查更新
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户中心页面 -->
+                <div id="profile" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-user me-2"></i>用户中心</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <div class="mx-auto mb-4">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                                            <i class="fas fa-user text-white" style="font-size: 3rem;"></i>
+                                        </div>
+                                    </div>
+                                    <h4>张三</h4>
+                                    <p class="text-muted">店铺管理员</p>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary">
+                                            <i class="fas fa-edit me-2"></i>编辑资料
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-chart-simple me-2"></i>个人业绩</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center mb-3">
+                                        <div class="stat-number">86</div>
+                                        <div class="stat-label">本月上架商品</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="stat-number">¥24,580</div>
+                                        <div class="stat-label">本月销售额</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>个人信息</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">姓名</label>
+                                                <input type="text" class="form-control" value="张三">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">用户名</label>
+                                                <input type="text" class="form-control" value="zhangsan">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">邮箱</label>
+                                                <input type="email" class="form-control" value="zhangsan@example.com">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">手机号</label>
+                                                <input type="tel" class="form-control" value="138****8888">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">职位</label>
+                                            <input type="text" class="form-control" value="店铺管理员">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">部门</label>
+                                            <input type="text" class="form-control" value="运营部">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">更新信息</button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-lock me-2"></i>安全设置</h5>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-outline-primary mb-2">
+                                        <i class="fas fa-key me-2"></i>修改密码
+                                    </button>
+                                    <button class="btn btn-outline-secondary mb-2">
+                                        <i class="fas fa-shield-alt me-2"></i>双重验证
+                                    </button>
+                                    <button class="btn btn-outline-info">
+                                        <i class="fas fa-history me-2"></i>登录历史
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI助手页面 -->
+                <div id="ai-assistant" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-robot me-2"></i>AI助手</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-comments me-2"></i>智能对话</h5>
+                                </div>
+                                <div class="card-body" style="height: 400px; overflow-y: auto;">
+                                    <div class="mb-3">
+                                        <div class="alert alert-primary">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-robot"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong>AI助手：</strong>
+                                                    <p class="mb-0">您好！我是您的AI助手，可以帮助您分析商品、优化描述、生成标题等。请问有什么我可以帮您的吗？</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="alert alert-secondary">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong>您：</strong>
+                                                    <p class="mb-0">如何提高商品的搜索排名？</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="alert alert-primary">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-robot"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong>AI助手：</strong>
+                                                    <p class="mb-0">提高商品搜索排名的方法包括：</p>
+                                                    <ol class="mb-0">
+                                                        <li>优化商品标题，包含核心关键词</li>
+                                                        <li>完善商品描述，突出卖点</li>
+                                                        <li>使用高质量商品图片</li>
+                                                        <li>积累正面评价</li>
+                                                        <li>定期更新商品信息</li>
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="输入您的问题...">
+                                        <button class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>功能推荐</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary">
+                                            <i class="fas fa-sync me-2"></i>重新分析商品
+                                        </button>
+                                        <button class="btn btn-outline-success">
+                                            <i class="fas fa-magic me-2"></i>优化商品描述
+                                        </button>
+                                        <button class="btn btn-outline-warning">
+                                            <i class="fas fa-heading me-2"></i>生成新标题
+                                        </button>
+                                        <button class="btn btn-outline-info">
+                                            <i class="fas fa-tags me-2"></i>推荐关键词
+                                        </button>
+                                        <button class="btn btn-outline-secondary">
+                                            <i class="fas fa-chart-line me-2"></i>分析销售数据
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>常见问题</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="accordion" id="faqAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                                    如何上传商品图片？
+                                                </button>
+                                            </h2>
+                                            <div id="faq1" class="accordion-collapse collapse">
+                                                <div class="accordion-body">
+                                                    点击商品上架页面的上传区域，选择图片文件或拖拽图片到指定区域即可上传。
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                                    AI分析需要多长时间？
+                                                </button>
+                                            </h2>
+                                            <div id="faq2" class="accordion-collapse collapse">
+                                                <div class="accordion-body">
+                                                    通常在几秒内完成，具体取决于图片大小和服务器负载。
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                                    可以修改AI生成的内容吗？
+                                                </button>
+                                            </h2>
+                                            <div id="faq3" class="accordion-collapse collapse">
+                                                <div class="accordion-body">
+                                                    当然可以，所有AI生成的内容都可以手动编辑修改。
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关键词优化页面 -->
+                <div id="keywords" class="page-content">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="mb-4"><i class="fas fa-tags me-2"></i>关键词优化</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>关键词研究</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="输入要研究的关键词...">
+                                        <button class="btn btn-primary">
+                                            <i class="fas fa-search me-2"></i>搜索
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>关键词</th>
+                                                    <th>搜索量</th>
+                                                    <th>竞争度</th>
+                                                    <th>相关性</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>无线蓝牙耳机</td>
+                                                    <td>12,842</td>
+                                                    <td><span class="text-warning">中等</span></td>
+                                                    <td><span class="text-success">高</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>降噪耳机</td>
+                                                    <td>8,563</td>
+                                                    <td><span class="text-danger">高</span></td>
+                                                    <td><span class="text-success">高</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>运动耳机</td>
+                                                    <td>6,231</td>
+                                                    <td><span class="text-success">低</span></td>
+                                                    <td><span class="text-success">高</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>推荐关键词</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">已选关键词</label>
+                                        <div>
+                                            <span class="keyword-badge">蓝牙耳机</span>
+                                            <span class="keyword-badge">无线</span>
+                                            <span class="keyword-badge">降噪</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="form-label">热门关键词</label>
+                                        <div>
+                                            <span class="keyword-badge">运动耳机</span>
+                                            <span class="keyword-badge">入耳式</span>
+                                            <span class="keyword-badge">长续航</span>
+                                            <span class="keyword-badge">轻便</span>
+                                            <span class="keyword-badge">高清音质</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary w-100 mt-3">
+                                        <i class="fas fa-save me-2"></i>保存关键词
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>关键词效果</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center mb-3">
+                                        <div class="stat-number">24.5%</div>
+                                        <div class="stat-label">关键词贡献转化率</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="stat-number">1,248</div>
+                                        <div class="stat-label">关键词带来流量</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">商品智能上架系统</h5>
+                    <p>利用人工智能技术，帮助商家快速高效地上架商品，提升销售转化率。</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-3">功能</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="footer-link" onclick="showPage('listing')">商品识别</a></li>
+                        <li><a href="#" class="footer-link" onclick="showPage('listing')">智能描述</a></li>
+                        <li><a href="#" class="footer-link" onclick="showPage('listing')">语音播报</a></li>
+                        <li><a href="#" class="footer-link" onclick="showPage('analytics')">数据分析</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-3">支持</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="footer-link">帮助中心</a></li>
+                        <li><a href="#" class="footer-link">用户指南</a></li>
+                        <li><a href="#" class="footer-link">API文档</a></li>
+                        <li><a href="#" class="footer-link">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">订阅更新</h5>
+                    <p>订阅我们的新闻通讯，获取最新功能和优惠信息。</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="您的邮箱地址">
+                        <button class="btn btn-primary">订阅</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p>&copy; 2025 智能商品上架系统. 期末实践项目保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 页面切换函数
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 显示目标页面
+            document.getElementById(pageId).classList.add('active');
+            
+            // 更新导航链接状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // 为当前页面的导航链接添加活动状态
+            event?.target?.classList?.add('active');
+        }
+
+        // 图表数据
+        document.addEventListener('DOMContentLoaded', function() {
+            // 性能趋势图
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            const performanceChart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '商品浏览量',
+                        data: [1200, 1900, 1500, 2500, 2200, 3000],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '销售转化率',
+                        data: [65, 78, 70, 85, 82, 89],
+                        borderColor: '#4cc9f0',
+                        backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 品类分布图
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['服装', '电子产品', '家居用品', '美妆护肤', '运动户外'],
+                    datasets: [{
+                        data: [35, 25, 20, 12, 8],
+                        backgroundColor: [
+                            '#4361ee',
+                            '#3f37c9',
+                            '#4cc9f0',
+                            '#4895ef',
+                            '#4dae4a'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // 销售趋势图
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(salesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '销售额',
+                        data: [24000, 32000, 28000, 45000, 38000, 52000],
+                        backgroundColor: '#4361ee',
+                        borderColor: '#3f37c9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 热销品类图
+            const hotCategoryCtx = document.getElementById('hotCategoryChart').getContext('2d');
+            const hotCategoryChart = new Chart(hotCategoryCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['电子产品', '服装配饰', '家居用品', '美妆护肤', '运动户外'],
+                    datasets: [{
+                        data: [40, 25, 15, 12, 8],
+                        backgroundColor: [
+                            '#4361ee',
+                            '#4cc9f0',
+                            '#3f37c9',
+                            '#4895ef',
+                            '#4dae4a'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+
+            // 上传区域交互
+            const dropArea = document.getElementById('dropArea');
+            const fileInput = document.getElementById('productImage');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const imagePreview = document.getElementById('imagePreview');
+            const voiceBtn = document.getElementById('voiceBtn');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            // 点击上传按钮
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            // 文件选择后处理
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid" alt="商品预览" style="height: 300px; object-fit: cover;">`;
+                        
+                        // 模拟AI分析过程
+                        simulateAIAnalysis();
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // 拖拽上传功能
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                dropArea.style.backgroundColor = 'rgba(67, 97, 238, 0.15)';
+                dropArea.style.borderColor = '#4361ee';
+            }
+
+            function unhighlight() {
+                dropArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+                dropArea.style.borderColor = '#4361ee';
+            }
+
+            dropArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    fileInput.files = files;
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid" alt="商品预览" style="height: 300px; object-fit: cover;">`;
+                        
+                        // 模拟AI分析过程
+                        simulateAIAnalysis();
+                    }
+                    
+                    reader.readAsDataURL(files[0]);
+                }
+            }
+
+            // 语音播报按钮
+            voiceBtn.addEventListener('click', function() {
+                this.classList.toggle('playing');
+                const icon = this.querySelector('i');
+                
+                if (this.classList.contains('playing')) {
+                    icon.className = 'fas fa-pause';
+                    // 模拟语音播放
+                    setTimeout(() => {
+                        this.classList.remove('playing');
+                        icon.className = 'fas fa-play';
+                    }, 5000);
+                } else {
+                    icon.className = 'fas fa-play';
+                }
+            });
+
+            // 表单提交
+            document.getElementById('productForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('商品已成功上架！');
+            });
+
+            // 关键词点击效果
+            const keywords = document.querySelectorAll('.keyword-badge');
+            keywords.forEach(keyword => {
+                keyword.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    if (this.classList.contains('active')) {
+                        this.style.backgroundColor = 'var(--primary-color)';
+                        this.style.color = 'white';
+                    } else {
+                        this.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+                        this.style.color = 'var(--primary-color)';
+                    }
+                });
+            });
+
+            // 重新分析按钮
+            analyzeBtn.addEventListener('click', function() {
+                if (document.getElementById('productImage').files.length > 0) {
+                    simulateAIAnalysis();
+                } else {
+                    alert('请先上传商品图片');
+                }
+            });
+
+            // 定义AI分析函数
+            function simulateAIAnalysis() {
+                analyzeImageWithAI();
+            }
+            
+            // 使用AI API分析图片
+            function analyzeImageWithAI() {
+                // 显示加载遮罩
+                loadingOverlay.style.display = 'flex';
+                
+                // 获取选中的图片文件
+                const file = fileInput.files[0];
+                if (!file) return;
+                
+                // 创建FormData对象
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                // 调用后端API
+                fetch('http://localhost:3000/api/analyze', {  // 修改为正确的后端API路径
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('图片分析失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 隐藏加载遮罩
+                    loadingOverlay.style.display = 'none';
+                    
+                    // 显示分析结果区域
+                    document.getElementById('analysisSection').style.display = 'block';
+                    
+                    // 使用API返回的数据更新UI
+                    updateUIWithAnalysisResult(data.data);  // 注意：后端返回的是{success: true, data: result}格式
+                })
+                .catch(error => {
+                    // 隐藏加载遮罩
+                    loadingOverlay.style.display = 'none';
+                    
+                    // 显示错误提示
+                    alert('AI分析失败：' + error.message);
+                });
+            }
+            
+            // 使用分析结果更新UI
+            function updateUIWithAnalysisResult(data) {
+                // 商品特征
+                const featuresContainer = document.getElementById('featuresContainer');
+                featuresContainer.innerHTML = '';
+                (data.features || ['高质量材料', '时尚设计', '舒适体验', '耐用性强', '环保材质', '轻便易携']).forEach(feature => {
+                    const span = document.createElement('span');
+                    span.className = 'feature-tag';
+                    span.textContent = feature;
+                    featuresContainer.appendChild(span);
+                });
+
+                // 核心卖点
+                const sellingPointsContainer = document.getElementById('sellingPointsContainer');
+                sellingPointsContainer.innerHTML = '';
+                (data.sellingPoints || [
+                    {title: '卓越品质保证', desc: '采用优质材料制造，确保产品持久耐用'},
+                    {title: '人体工学设计', desc: '符合人体工程学原理，提供最佳使用体验'},
+                    {title: '环保可持续', desc: '使用环保材料，减少对环境的影响'}
+                ]).forEach(point => {
+                    const div = document.createElement('div');
+                    div.className = 'selling-point';
+                    div.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">${point.title}</h6>
+                            <p class="mb-0 text-muted">${point.desc}</p>
+                        </div>
+                    `;
+                    sellingPointsContainer.appendChild(div);
+                });
+
+                // 推荐标题
+                const titlesContainer = document.getElementById('titlesContainer');
+                titlesContainer.innerHTML = '';
+                (data.titles || [
+                    '【限时特惠】高品质时尚手提包 女士潮流单肩包 商务休闲两用',
+                    '新款韩版女士手提包 时尚百搭真皮单肩包 大容量商务通勤包',
+                    '轻奢真皮女包 2023新款潮流行李包 时尚简约百搭手提单肩包'
+                ]).forEach(title => {
+                    const div = document.createElement('div');
+                    div.className = 'alert alert-primary';
+                    div.innerHTML = `<h6>${title}</h6>`;
+                    titlesContainer.appendChild(div);
+                });
+
+                // 关键词推荐
+                const keywordsContainer = document.getElementById('keywordsContainer');
+                keywordsContainer.innerHTML = '';
+                (data.keywords || ['女士手提包', '真皮包包', '时尚单肩包', '商务通勤', '韩版潮流', '大容量', '轻奢女包', '2023新款']).forEach(keyword => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword-badge';
+                    span.textContent = keyword;
+                    keywordsContainer.appendChild(span);
+                });
+
+                // 更新预览区域
+                const firstTitle = data.titles && data.titles.length > 0 ? data.titles[0] : '【限时特惠】高品质时尚手提包 女士潮流单肩包 商务休闲两用';
+                const aiDescription = data.description || 'AI生成的商品描述，可根据需要修改。';
+                document.getElementById('previewTitle').textContent = firstTitle;
+                document.getElementById('productName').value = firstTitle;
+                document.getElementById('previewDescription').textContent = aiDescription;
+                document.getElementById('productDescription').value = aiDescription;
+                document.getElementById('productPrice').value = '299.00';
+            }
+
+            // 生成模拟分析数据
+            function generateMockAnalysisData() {
+                // 商品特征
+                const features = ['高质量材料', '时尚设计', '舒适体验', '耐用性强', '环保材质', '轻便易携'];
+                const featuresContainer = document.getElementById('featuresContainer');
+                featuresContainer.innerHTML = '';
+                features.forEach(feature => {
+                    const span = document.createElement('span');
+                    span.className = 'feature-tag';
+                    span.textContent = feature;
+                    featuresContainer.appendChild(span);
+                });
+
+                // 核心卖点
+                const sellingPoints = [
+                    {title: '卓越品质保证', desc: '采用优质材料制造，确保产品持久耐用'},
+                    {title: '人体工学设计', desc: '符合人体工程学原理，提供最佳使用体验'},
+                    {title: '环保可持续', desc: '使用环保材料，减少对环境的影响'}
+                ];
+                const sellingPointsContainer = document.getElementById('sellingPointsContainer');
+                sellingPointsContainer.innerHTML = '';
+                sellingPoints.forEach(point => {
+                    const div = document.createElement('div');
+                    div.className = 'selling-point';
+                    div.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">${point.title}</h6>
+                            <p class="mb-0 text-muted">${point.desc}</p>
+                        </div>
+                    `;
+                    sellingPointsContainer.appendChild(div);
+                });
+
+                // 推荐标题
+                const titles = [
+                    '【限时特惠】高品质时尚手提包 女士潮流单肩包 商务休闲两用',
+                    '新款韩版女士手提包 时尚百搭真皮单肩包 大容量商务通勤包',
+                    '轻奢真皮女包 2023新款潮流行李包 时尚简约百搭手提单肩包'
+                ];
+                const titlesContainer = document.getElementById('titlesContainer');
+                titlesContainer.innerHTML = '';
+                titles.forEach(title => {
+                    const div = document.createElement('div');
+                    div.className = 'alert alert-primary';
+                    div.innerHTML = `<h6>${title}</h6>`;
+                    titlesContainer.appendChild(div);
+                });
+
+                // 关键词推荐
+                const keywords = ['女士手提包', '真皮包包', '时尚单肩包', '商务通勤', '韩版潮流', '大容量', '轻奢女包', '2023新款'];
+                const keywordsContainer = document.getElementById('keywordsContainer');
+                keywordsContainer.innerHTML = '';
+                keywords.forEach(keyword => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword-badge';
+                    span.textContent = keyword;
+                    keywordsContainer.appendChild(span);
+                });
+
+                // 更新预览区域
+                document.getElementById('previewTitle').textContent = '【限时特惠】高品质时尚手提包 女士潮流单肩包 商务休闲两用';
+                document.getElementById('previewDescription').textContent = '这款时尚手提包采用优质真皮材料制作，设计简约大方，适合商务和休闲场合。内部空间充足，可容纳日常所需物品。';
+                document.getElementById('productDescription').value = '这款时尚手提包采用优质真皮材料制作，设计简约大方，适合商务和休闲场合。内部空间充足，可容纳日常所需物品。';
+                document.getElementById('productName').value = '高品质时尚手提包';
+                document.getElementById('productPrice').value = '299.00';
+            }
+        });
+    </script>
+</body>
+</html>

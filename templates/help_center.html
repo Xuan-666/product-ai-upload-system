@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}帮助中心{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- 页面标题 -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">帮助中心</h1>
+        <p class="text-slate-600 dark:text-slate-400">我们随时为您提供帮助</p>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="mb-8">
+        <div class="relative max-w-2xl mx-auto">
+            <input type="text" placeholder="搜索帮助文档..." 
+                   class="w-full px-4 py-3 pl-12 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary">
+            <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+        </div>
+    </div>
+
+    <!-- 常见问题分类 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- 快速开始 -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa fa-rocket text-primary text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">快速开始</h2>
+            </div>
+            <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+                <li><a href="#" class="hover:text-primary">系统介绍</a></li>
+                <li><a href="#" class="hover:text-primary">账号注册与登录</a></li>
+                <li><a href="#" class="hover:text-primary">首次使用指南</a></li>
+                <li><a href="#" class="hover:text-primary">界面布局说明</a></li>
+            </ul>
+        </div>
+
+        <!-- 商品管理 -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa fa-shopping-bag text-primary text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">商品管理</h2>
+            </div>
+            <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+                <li><a href="#" class="hover:text-primary">如何上传商品</a></li>
+                <li><a href="#" class="hover:text-primary">商品分类说明</a></li>
+                <li><a href="#" class="hover:text-primary">批量操作指南</a></li>
+                <li><a href="#" class="hover:text-primary">商品状态管理</a></li>
+            </ul>
+        </div>
+
+        <!-- AI功能 -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa fa-magic text-primary text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">AI功能</h2>
+            </div>
+            <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+                <li><a href="#" class="hover:text-primary">AI图片识别</a></li>
+                <li><a href="#" class="hover:text-primary">智能标题生成</a></li>
+                <li><a href="#" class="hover:text-primary">卖点提取</a></li>
+                <li><a href="#" class="hover:text-primary">语音介绍生成</a></li>
+            </ul>
+        </div>
+
+        <!-- 销售分析 -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa fa-line-chart text-primary text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">销售分析</h2>
+            </div>
+            <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+                <li><a href="#" class="hover:text-primary">销售报表查看</a></li>
+                <li><a href="#" class="hover:text-primary">数据导出</a></li>
+                <li><a href="#" class="hover:text-primary">趋势分析</a></li>
+                <li><a href="#" class="hover:text-primary">转化率优化</a></li>
+            </ul>
+        </div>
+
+        <!-- 系统设置 -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa fa-cog text-primary text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">系统设置</h2>
+            </div>
+            <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+                <li><a href="#" class="hover:text-primary">店铺信息设置</a></li>
+                <li><a href="#" class="hover:text-primary">Logo上传</a></li>
+                <li><a href="#" class="hover:text-primary">功能开关</a></li>
+                <li><a href="#" class="hover:text-primary">语言与语气</a></li>
+            </ul>
+        </div>
+
+        <!-- 常见问题 -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa fa-question-circle text-primary text-xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">常见问题</h2>
+            </div>
+            <ul class="space-y-2 text-slate-600 dark:text-slate-400">
+                <li><a href="#" class="hover:text-primary">忘记密码</a></li>
+                <li><a href="#" class="hover:text-primary">账号安全</a></li>
+                <li><a href="#" class="hover:text-primary">支付问题</a></li>
+                <li><a href="#" class="hover:text-primary">技术支持</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 联系我们 -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-6 text-center">需要更多帮助？</h2>
+        <p class="text-slate-600 dark:text-slate-400 text-center mb-6">如果以上内容没有解决您的问题，请随时联系我们的客服团队</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-envelope text-primary text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">邮件支持</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">2940472078@qq.com</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-phone text-primary text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">电话支持</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">400-888-8888</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-comments text-primary text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">在线客服</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">7x24小时在线</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

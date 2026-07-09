@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - 智能商品上架系统</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        // 配置Tailwind暗色模式
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                    },
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-open {
+                @apply translate-x-0;
+            }
+            .sidebar-closed {
+                @apply -translate-x-full;
+            }
+            .main-expanded {
+                @apply ml-64;
+            }
+            .main-collapsed {
+                @apply ml-20;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white dark:bg-slate-800 shadow-lg fixed top-0 left-0 right-0 z-50">
+        <div class="flex justify-between items-center h-16 px-4">
+            <!-- 左侧：品牌Logo和侧边栏切换按钮 -->
+            <div class="flex items-center">
+                <button id="sidebar-toggle" class="p-2 rounded-md mr-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                    <i class="fa fa-bars text-lg"></i>
+                </button>
+                <div class="flex items-center">
+                    <i class="fa fa-shopping-bag text-2xl mr-2 text-primary"></i>
+                    <h1 class="text-xl font-bold">智能商品上架系统</h1>
+                </div>
+            </div>
+            
+            <!-- 右侧：通知、主题切换和用户菜单 -->
+            <div class="flex items-center space-x-4">
+                <!-- 通知按钮 -->
+                <div class="relative group">
+                    <button id="notification-btn" class="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        <i class="fa fa-bell text-lg"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <!-- 通知下拉菜单 -->
+                    <div id="notification-dropdown" class="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 shadow-xl rounded-lg z-50 hidden">
+                        <!-- 通知顶部 -->
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-700">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold">通知中心</h3>
+                                <a href="#" class="text-sm text-primary hover:underline">查看全部</a>
+                            </div>
+                        </div>
+                        <!-- 通知分类 -->
+                        <div class="flex border-b border-slate-200 dark:border-slate-700">
+                            <button class="flex-1 py-2 px-4 text-sm font-medium text-primary bg-primary/10 dark:bg-primary/20">全部</button>
+                            <button class="flex-1 py-2 px-4 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">系统通知</button>
+                            <button class="flex-1 py-2 px-4 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">申诉申请</button>
+                        </div>
+                        <!-- 通知列表 -->
+                        <div class="max-h-96 overflow-y-auto">
+                            <!-- 通知项 -->
+                            <div class="p-4 border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                <div class="flex space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <i class="fa fa-shopping-bag text-primary"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">商品审核通过</p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">您的商品"智能手表"已审核通过，现在可以上架销售。</p>
+                                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">1小时前</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 通知项 -->
+                            <div class="p-4 border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                <div class="flex space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
+                                        <i class="fa fa-exclamation-triangle text-warning"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">商品信息不完整</p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">您的商品"无线耳机"信息不完整，请尽快补充。</p>
+                                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">3小时前</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 通知底部 -->
+                        <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                            <button class="w-full py-2 px-4 text-sm font-medium text-primary hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-md">
+                                查看所有通知
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 主题模式切换 -->
+                <div class="relative group">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        <i class="fa fa-moon-o dark:hidden text-lg"></i>
+                        <i class="fa fa-sun-o hidden dark:block text-lg"></i>
+                    </button>
+                    <!-- 主题模式下拉菜单 -->
+                    <div id="theme-dropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 shadow-xl rounded-lg z-50 hidden">
+                        <div class="p-2">
+                            <button id="theme-light" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fa fa-sun-o text-yellow-500"></i>
+                                <span class="text-sm">浅色模式</span>
+                            </button>
+                            <button id="theme-dark" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fa fa-moon-o text-slate-400"></i>
+                                <span class="text-sm">深色模式</span>
+                            </button>
+                            <button id="theme-system" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <i class="fa fa-desktop text-primary"></i>
+                                <span class="text-sm">跟随系统</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 用户菜单 -->
+                <div class="relative group">
+                    <button id="user-menu-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa fa-user text-primary"></i>
+                        </div>
+                        <span class="text-sm font-medium">管理员</span>
+                        <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                    <!-- 用户下拉菜单 -->
+                    <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 shadow-xl rounded-lg z-50 hidden">
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-medium">管理员</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">admin@example.com</p>
+                        </div>
+                        <div class="p-2">
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-md">
+                                <i class="fa fa-user-circle mr-2"></i>个人中心
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-md">
+                                <i class="fa fa-cog mr-2"></i>设置
+                            </a>
+                        </div>
+                        <div class="p-2 border-t border-slate-200 dark:border-slate-700">
+                            <a href="#" class="block px-4 py-2 text-sm text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-md">
+                                <i class="fa fa-sign-out mr-2"></i>退出登录
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 侧边栏导航 -->
+    <aside id="sidebar" class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-slate-800 shadow-lg transform transition-transform duration-300 z-40 overflow-y-auto">
+        <div class="py-4">
+            <!-- 侧边栏导航菜单 -->
+            <nav class="px-4">
+                <!-- 主菜单 -->
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-tachometer text-lg"></i>
+                            <span>仪表盘</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/product_management" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-shopping-cart text-lg"></i>
+                            <span>商品管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/product_upload" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-upload text-lg"></i>
+                            <span>商品上传</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/sales_analysis" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-bar-chart text-lg"></i>
+                            <span>销售分析</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/system_settings" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-cog text-lg"></i>
+                            <span>系统设置</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ai_assistant" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-robot text-lg"></i>
+                            <span>AI助手</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- 分隔线 -->
+                <div class="h-px bg-slate-200 dark:bg-slate-700 my-4"></div>
+                
+                <!-- 其他菜单 -->
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/help_center" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-question-circle text-lg"></i>
+                            <span>帮助中心</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/about_us" class="flex items-center space-x-3 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-info-circle text-lg"></i>
+                            <span>关于我们</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+    
+    <!-- 主内容区域 -->
+    <main id="main-content" class="pt-16 main-expanded transition-all duration-300">
+        <div class="p-4 sm:p-6">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-white dark:bg-slate-800 shadow-inner main-expanded transition-all duration-300">
+        <div class="p-4 text-center text-sm text-slate-500 dark:text-slate-400">
+            <p>&copy; 2025 智能商品上架系统 - 炳材保留所有权利.</p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // 侧边栏切换
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.querySelector('footer');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            sidebar.classList.toggle('sidebar-closed');
+            mainContent.classList.toggle('main-expanded');
+            mainContent.classList.toggle('main-collapsed');
+            footer.classList.toggle('main-expanded');
+            footer.classList.toggle('main-collapsed');
+        });
+        
+        // 主题切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = themeToggle.querySelector('.fa-sun-o');
+        const moonIcon = themeToggle.querySelector('.fa-moon-o');
+        const themeDropdown = document.getElementById('theme-dropdown');
+        const themeLightBtn = document.getElementById('theme-light');
+        const themeDarkBtn = document.getElementById('theme-dark');
+        const themeSystemBtn = document.getElementById('theme-system');
+        
+        // 检查本地存储中的主题偏好
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // 应用保存的主题或系统默认主题
+        function applyTheme(theme) {
+            document.documentElement.classList.remove('dark');
+            if (theme === 'dark' || (theme === 'system' && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        }
+        
+        // 初始化主题
+        applyTheme(savedTheme || 'system');
+        
+        // 主题切换按钮点击事件
+        themeToggle.addEventListener('click', () => {
+            themeDropdown.classList.toggle('hidden');
+        });
+        
+        // 主题下拉菜单选项点击事件
+        themeLightBtn.addEventListener('click', () => {
+            localStorage.setItem('theme', 'light');
+            applyTheme('light');
+            themeDropdown.classList.add('hidden');
+        });
+        
+        themeDarkBtn.addEventListener('click', () => {
+            localStorage.setItem('theme', 'dark');
+            applyTheme('dark');
+            themeDropdown.classList.add('hidden');
+        });
+        
+        themeSystemBtn.addEventListener('click', () => {
+            localStorage.setItem('theme', 'system');
+            applyTheme('system');
+            themeDropdown.classList.add('hidden');
+        });
+        
+        // 系统主题变化监听
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (localStorage.getItem('theme') === 'system') {
+                applyTheme('system');
+            }
+        });
+        
+        // 通知下拉菜单
+        const notificationBtn = document.getElementById('notification-btn');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        
+        notificationBtn.addEventListener('click', () => {
+            notificationDropdown.classList.toggle('hidden');
+        });
+        
+        // 用户下拉菜单
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        userMenuBtn.addEventListener('click', () => {
+            userDropdown.classList.toggle('hidden');
+        });
+        
+        // 点击页面其他地方关闭下拉菜单
+        document.addEventListener('click', (e) => {
+            // 关闭通知下拉菜单
+            if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.classList.add('hidden');
+            }
+            
+            // 关闭用户下拉菜单
+            if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.add('hidden');
+            }
+            
+            // 关闭主题下拉菜单
+            if (!themeToggle.contains(e.target) && !themeDropdown.contains(e.target)) {
+                themeDropdown.classList.add('hidden');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

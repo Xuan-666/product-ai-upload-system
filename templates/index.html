@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}首页{% endblock %}
+
+{% block content %}
+    <!-- 页面标题 -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">商品智能分析与上架</h2>
+        <p class="text-slate-500 dark:text-slate-400">上传商品图片，自动生成标题、卖点和语音介绍</p>
+    </div>
+
+    <!-- 上传区域 -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 mb-8">
+        <form id="upload-form" method="POST" action="/upload" enctype="multipart/form-data">
+            <div id="drop-zone" class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                <div class="mb-4">
+                    <i class="fa fa-cloud-upload text-4xl text-primary"></i>
+                </div>
+                <div class="mb-2">
+                    <h3 class="text-lg font-medium">拖拽图片到此处或</h3>
+                </div>
+                <div>
+                    <input type="file" name="image" id="file-input" class="hidden" accept="image/*">
+                    <label for="file-input" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors cursor-pointer" onclick="event.stopPropagation();">
+                        <i class="fa fa-folder-open mr-1"></i> 选择图片
+                    </label>
+                </div>
+                <div class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+                    支持 JPG、JPEG、PNG、GIF 格式，文件大小不超过 10MB
+                </div>
+            </div>
+            
+            <!-- 提交按钮 -->
+            <div class="mt-6 text-center">
+                <button type="submit" class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium shadow-md">
+                    <i class="fa fa-magic mr-2"></i> 开始智能分析
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 图片预览和结果生成区 -->
+    {% if filename %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 图片预览 -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4">图片预览</h3>
+            <div class="flex justify-center">
+                <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="上传的商品图片" class="max-w-full max-h-96 object-contain rounded-lg shadow-md">
+            </div>
+        </div>
+        
+        <!-- 结果生成区 -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4">分析结果</h3>
+            
+            <!-- 商品名称 -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">商品名称</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    <input type="text" name="product_name" class="w-full bg-transparent border-none text-primary font-medium focus:outline-none focus:ring-2 focus:ring-primary" value="{{ product_info.titles[0] if product_info and product_info.titles and product_info.titles|length > 0 else '智能生成的商品名称将显示在这里' }}">
+                </div>
+            </div>
+            
+            <!-- 商品分类 -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">商品分类</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    <select name="product_category" id="product_category" class="w-full bg-transparent border-none text-slate-700 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="electronics" {% if product_info and product_info.category == 'electronics' %}selected{% endif %}>电子产品</option>
+                        <option value="clothing" {% if product_info and product_info.category == 'clothing' %}selected{% endif %}>服装</option>
+                        <option value="home" {% if product_info and product_info.category == 'home' %}selected{% endif %}>家居用品</option>
+                        <option value="beauty" {% if product_info and product_info.category == 'beauty' %}selected{% endif %}>美妆</option>
+                        <option value="sports" {% if product_info and product_info.category == 'sports' %}selected{% endif %}>运动用品</option>
+                        <option value="food" {% if product_info and product_info.category == 'food' %}selected{% endif %}>食品</option>
+                        <option value="books" {% if product_info and product_info.category == 'books' %}selected{% endif %}>图书</option>
+                        <option value="toys" {% if product_info and product_info.category == 'toys' %}selected{% endif %}>玩具</option>
+                        <option value="other" {% if product_info and product_info.category == 'other' %}selected{% endif %}>其他</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 推荐标题 -->
+            {% if product_info and product_info.titles %}
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">推荐标题</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    <ul class="space-y-2">
+                        {% for title in product_info.titles %}
+                        <li class="flex items-center space-x-2">
+                            <span class="text-primary font-medium">•</span>
+                            <input type="text" name="titles[]" class="flex-1 bg-transparent border-none text-sm focus:outline-none focus:ring-2 focus:ring-primary" value="{{ title }}">
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 标签云 -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">商品标签</h4>
+                <div class="flex flex-wrap gap-2" id="tags-container">
+                    {% if product_info and product_info.features %}
+                        {% for tag in product_info.features %}
+                        <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center">
+                            <input type="text" value="{{ tag }}" class="bg-transparent border-none text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary w-20">
+                            <button type="button" class="ml-1 text-primary hover:text-red-500" onclick="this.parentElement.remove()">×</button>
+                        </span>
+                        {% endfor %}
+                    {% else %}
+                        {% for tag in ['智能', '高效', '便捷', '优质'] %}
+                        <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center">
+                            <input type="text" value="{{ tag }}" class="bg-transparent border-none text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary w-20">
+                            <button type="button" class="ml-1 text-primary hover:text-red-500" onclick="this.parentElement.remove()">×</button>
+                        </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <button type="button" class="mt-2 px-3 py-1 bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg text-sm hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors" onclick="addTag()">
+                    <i class="fa fa-plus mr-1"></i> 添加标签
+                </button>
+            </div>
+            
+            <!-- 详细描述 -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">商品描述</h4>
+                <textarea name="description" class="w-full h-32 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-primary">
+{{ product_info.description if product_info and product_info.description else '智能生成的商品描述将显示在这里...' }}
+                </textarea>
+            </div>
+            
+            <!-- 卖点列表 -->
+            {% if product_info and product_info.sellingPoints %}
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">商品卖点</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    <ul class="space-y-2">
+                        {% for feature in product_info.sellingPoints %}
+                        <li class="flex items-center space-x-2">
+                            <span class="text-primary font-medium">•</span>
+                            <input type="text" name="selling_points[]" class="flex-1 bg-transparent border-none text-sm focus:outline-none focus:ring-2 focus:ring-primary" value="{{ feature.title if feature.title else feature }}">
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 价格信息 -->
+            {% if product_info and product_info.price %}
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">价格建议</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    <input type="text" name="price" class="w-full bg-transparent border-none text-primary font-medium text-xl focus:outline-none focus:ring-2 focus:ring-primary" value="{{ product_info.price }}">
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 音频播放器 -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">语音介绍</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    {% if product_info and product_info.audio_filename %}
+                        <audio controls class="w-full">
+                            <source src="{{ url_for('static', filename='audio/' + product_info.audio_filename) }}" type="audio/mpeg">
+                            您的浏览器不支持音频播放。
+                        </audio>
+                    {% else %}
+                        <p class="text-sm text-slate-500 dark:text-slate-400">语音介绍将在这里显示</p>
+                    {% endif %}
+                    
+                    <!-- 生成语音按钮 -->
+                    <div class="mt-3">
+                        <form method="POST" action="/generate_speech">
+                            <input type="hidden" name="product_name" value="{{ product_info.titles[0] if product_info and product_info.titles and product_info.titles|length > 0 else '' }}">
+                            <input type="hidden" name="description" value="{{ product_info.description if product_info and product_info.description else '' }}">
+                            
+                            <!-- 特征标签 -->
+                            {% if product_info and product_info.features %}
+                                {% for feature in product_info.features %}
+                                    <input type="hidden" name="features[]" value="{{ feature }}">
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <!-- 卖点列表 -->
+                            {% if product_info and product_info.sellingPoints %}
+                                {% for point in product_info.sellingPoints %}
+                                    <input type="hidden" name="selling_points[]" value="{{ point.title if point.title else point }}">
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <button type="submit" class="px-6 py-2 bg-primary/90 text-white rounded-lg hover:bg-primary transition-colors text-sm font-medium">
+                                <i class="fa fa-microphone mr-1"></i> 生成语音介绍
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 上架数量 -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-2">上架数量</h4>
+                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                    <input type="number" name="stock_quantity" id="stock_quantity" class="w-full bg-transparent border-none text-primary font-medium focus:outline-none focus:ring-2 focus:ring-primary" value="100" min="1">
+                </div>
+            </div>
+            
+            <!-- 保存修改按钮 -->
+            <div class="mt-6">
+                <form id="save-form" method="POST" action="/save_modifications">
+                    <!-- 隐藏字段，用于提交商品信息 -->
+                    <input type="hidden" name="product_name" id="save_product_name">
+                    <input type="hidden" name="description" id="save_description">
+                    <input type="hidden" name="price" id="save_price">
+                    <input type="hidden" name="product_category" id="save_product_category">
+                    <input type="hidden" name="stock_quantity" id="save_stock_quantity">
+                    
+                    <!-- 动态生成的标题、卖点和标签字段 -->
+                    <div id="save_titles_container"></div>
+                    <div id="save_selling_points_container"></div>
+                    <div id="save_tags_container"></div>
+                    
+                    <button type="submit" class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium shadow-md">
+                        <i class="fa fa-save mr-2"></i> 保存修改并上架
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // 拖拽上传功能
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        // 拖拽事件
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // 拖拽高亮效果
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('border-primary');
+            dropZone.classList.add('bg-primary/5');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('border-primary');
+            dropZone.classList.remove('bg-primary/5');
+        }
+
+        // 处理文件拖放
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+            }
+        }
+
+        // 点击区域选择文件
+        dropZone.addEventListener('click', (e) => {
+            // 如果点击的不是文件输入框或其标签，则触发文件选择
+            if (e.target.id !== 'file-input' && e.target.tagName !== 'LABEL') {
+                fileInput.click();
+            }
+        });
+
+        // 表单提交时显示加载动画
+        const uploadForm = document.getElementById('upload-form');
+        uploadForm.addEventListener('submit', () => {
+            // 这里可以添加加载动画逻辑
+            const submitBtn = uploadForm.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 分析中...';
+            submitBtn.disabled = true;
+        });
+
+        // 保存表单提交前填充隐藏字段
+        const saveForm = document.getElementById('save-form');
+        saveForm.addEventListener('submit', (e) => {
+            // 获取所有需要保存的字段
+            const productNameInput = document.querySelector('input[name="product_name"]');
+            const descriptionTextarea = document.querySelector('textarea[name="description"]');
+            const priceInput = document.querySelector('input[name="price"]');
+            const categorySelect = document.getElementById('product_category');
+            const stockInput = document.getElementById('stock_quantity');
+            const titleInputs = document.querySelectorAll('input[name="titles[]"]');
+            const sellingPointInputs = document.querySelectorAll('input[name="selling_points[]"]');
+            const tagInputs = document.querySelectorAll('#tags-container input[type="text"]');
+            
+            // 填充隐藏字段
+            document.getElementById('save_product_name').value = productNameInput ? productNameInput.value : '';
+            document.getElementById('save_description').value = descriptionTextarea ? descriptionTextarea.value : '';
+            document.getElementById('save_price').value = priceInput ? priceInput.value : '';
+            document.getElementById('save_product_category').value = categorySelect ? categorySelect.value : 'electronics';
+            document.getElementById('save_stock_quantity').value = stockInput ? stockInput.value : '100';
+            
+            // 清空之前的动态字段
+            const titlesContainer = document.getElementById('save_titles_container');
+            const sellingPointsContainer = document.getElementById('save_selling_points_container');
+            const tagsContainer = document.getElementById('save_tags_container');
+            titlesContainer.innerHTML = '';
+            sellingPointsContainer.innerHTML = '';
+            tagsContainer.innerHTML = '';
+            
+            // 动态生成标题字段
+            titleInputs.forEach((input, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `titles[${index}]`;
+                hiddenInput.value = input.value;
+                titlesContainer.appendChild(hiddenInput);
+            });
+            
+            // 动态生成卖点字段
+            sellingPointInputs.forEach((input, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `selling_points[${index}]`;
+                hiddenInput.value = input.value;
+                sellingPointsContainer.appendChild(hiddenInput);
+            });
+            
+            // 动态生成标签字段
+            tagInputs.forEach((input, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `tags[${index}]`;
+                hiddenInput.value = input.value;
+                tagsContainer.appendChild(hiddenInput);
+            });
+        });
+        
+        // 添加标签功能
+        function addTag() {
+            const tagsContainer = document.getElementById('tags-container');
+            const newTag = document.createElement('span');
+            newTag.className = 'px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center';
+            newTag.innerHTML = `
+                <input type="text" value="" class="bg-transparent border-none text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary w-20" placeholder="新标签">
+                <button type="button" class="ml-1 text-primary hover:text-red-500" onclick="this.parentElement.remove()">×</button>
+            `;
+            tagsContainer.appendChild(newTag);
+            // 聚焦到新添加的输入框
+            newTag.querySelector('input').focus();
+        }
+    </script>
+{% endblock %}

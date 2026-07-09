@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}商品上传{% endblock %}
+
+{% block content %}
+            <!-- 页面标题 -->
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold mb-2">商品上传</h2>
+                <p class="text-slate-500 dark:text-slate-400">上传商品信息并上架销售</p>
+            </div>
+
+            <!-- 商品上传表单 -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                {% if error %}
+                    <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-300">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                {% if success %}
+                    <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-green-600 dark:text-green-300">
+                        {{ success }}
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- 商品基本信息 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- 商品名称 -->
+                        <div>
+                            <label for="product_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品名称 <span class="text-red-500">*</span></label>
+                            <input type="text" id="product_name" name="product_name" placeholder="请输入商品名称" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+
+                        <!-- 商品分类 -->
+                        <div>
+                            <label for="product_category" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品分类 <span class="text-red-500">*</span></label>
+                            <select id="product_category" name="product_category" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="">请选择分类</option>
+                                <option value="electronics">电子产品</option>
+                                <option value="clothing">服装</option>
+                                <option value="home">家居用品</option>
+                                <option value="beauty">美妆</option>
+                                <option value="sports">运动用品</option>
+                                <option value="books">图书</option>
+                                <option value="food">食品</option>
+                            </select>
+                        </div>
+
+                        <!-- 商品价格 -->
+                        <div>
+                            <label for="product_price" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品价格 <span class="text-red-500">*</span></label>
+                            <input type="number" id="product_price" name="product_price" placeholder="请输入商品价格" step="0.01" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+
+                        <!-- 商品库存 -->
+                        <div>
+                            <label for="product_stock" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品库存 <span class="text-red-500">*</span></label>
+                            <input type="number" id="product_stock" name="product_stock" placeholder="请输入商品库存" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                    </div>
+
+                    <!-- 商品描述 -->
+                    <div class="mb-6">
+                        <label for="product_description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品描述</label>
+                        <textarea id="product_description" name="product_description" rows="5" placeholder="请输入商品详细描述" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                    </div>
+
+                    <!-- 商品标签 -->
+                    <div class="mb-6">
+                        <label for="product_tags" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品标签</label>
+                        <input type="text" id="product_tags" name="product_tags" placeholder="请输入商品标签，用逗号分隔" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+
+                    <!-- 商品图片 -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">商品图片</label>
+                        <div class="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-lg p-6 hover:border-primary transition-colors">
+                            <div class="flex flex-col items-center text-center">
+                                <i class="fa fa-image text-4xl text-slate-400 mb-2"></i>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">点击或拖拽图片到此处上传</p>
+                                <p class="text-xs text-slate-400 dark:text-slate-500 mb-3">支持 JPG、JPEG、PNG、GIF 格式，单张不超过 5MB</p>
+                                <input type="file" name="images" id="images" accept="image/*" multiple class="hidden">
+                                <label for="images" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors cursor-pointer">
+                                    <i class="fa fa-upload mr-1"></i> 选择图片
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- 图片预览区域 -->
+                        <div id="image-preview-container" class="mt-4 grid grid-cols-4 gap-2"></div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" class="px-6 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                            取消
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fa fa-cloud-upload mr-1"></i> 上传商品
+                        </button>
+                    </div>
+                </form>
+            </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // 图片预览功能
+        const imagesInput = document.getElementById('images');
+        const previewContainer = document.getElementById('image-preview-container');
+        
+        imagesInput.addEventListener('change', (e) => {
+            // 清空现有预览
+            previewContainer.innerHTML = '';
+            
+            const files = e.target.files;
+            
+            if (files) {
+                // 遍历所有选中的图片文件
+                Array.from(files).forEach(file => {
+                    // 创建FileReader对象读取文件内容
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        // 创建预览元素
+                        const preview = document.createElement('div');
+                        preview.className = 'relative group';
+                        
+                        // 创建图片元素
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.className = 'w-full h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-600';
+                        img.alt = file.name;
+                        
+                        // 创建删除按钮
+                        const deleteButton = document.createElement('button');
+                        deleteButton.type = 'button';
+                        deleteButton.className = 'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity';
+                        deleteButton.innerHTML = '<i class="fa fa-times"></i>';
+                        
+                        // 点击删除按钮移除预览
+                        deleteButton.addEventListener('click', () => {
+                            preview.remove();
+                        });
+                        
+                        // 将图片和删除按钮添加到预览容器
+                        preview.appendChild(img);
+                        preview.appendChild(deleteButton);
+                        previewContainer.appendChild(preview);
+                    };
+                    
+                    // 读取文件内容为DataURL
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+        
+        // 拖拽上传功能
+        const dropZone = document.querySelector('.border-dashed');
+        
+        // 阻止默认拖拽行为
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // 添加拖拽状态样式
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropZone.classList.add('border-primary');
+        }
+        
+        function unhighlight() {
+            dropZone.classList.remove('border-primary');
+        }
+        
+        // 处理拖拽上传
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            // 将拖拽的文件设置到文件输入中
+            imagesInput.files = files;
+            
+            // 触发change事件以显示预览
+            imagesInput.dispatchEvent(new Event('change'));
+        }
+    </script>
+{% endblock %}
